@@ -38,21 +38,20 @@ export async function POST(request: Request) {
       if (!setupEsperado || !tokenSetupValido(setupRecibido, setupEsperado)) throw new Error("FORBIDDEN");
     }
 
-    const correo = body.correo.toLowerCase();
-    if (await prisma.user.findUnique({ where: { email: correo } })) throw new Error("CONFLICT:Ya existe un usuario con ese correo");
-    if (await prisma.user.findUnique({ where: { documento: body.documento } })) throw new Error("CONFLICT:Ese documento ya está registrado");
-    if (body.rol === "delegado" && !body.torneoId) throw new Error("BAD_REQUEST:Los delegados deben tener un torneo asignado");
-    if (body.torneoId && body.rol !== "delegado") throw new Error("BAD_REQUEST:El torneo solo se asigna a delegados");
-    if (body.torneoId && !(await prisma.torneo.findUnique({ where: { id: body.torneoId } }))) throw new Error("NOT_FOUND");
-
     const primerNombre = primerNombreDe(body.nombreCompleto);
     const base = normalizarUsuario(primerNombre);
     let usuario = base;
     for (let i = 1; await prisma.user.findUnique({ where: { username: usuario } }); i++) {
       usuario = `${base}${i}`;
     }
+    const correo = (body.correo || `${usuario}.${body.documento}@padresplus50.local`).toLowerCase();
+    if (await prisma.user.findUnique({ where: { email: correo } })) throw new Error("CONFLICT:Ya existe un usuario con ese correo");
+    if (await prisma.user.findUnique({ where: { documento: body.documento } })) throw new Error("CONFLICT:Ese documento ya está registrado");
+    if (body.rol === "delegado" && !body.torneoId) throw new Error("BAD_REQUEST:Los delegados deben tener un torneo asignado");
+    if (body.torneoId && body.rol !== "delegado") throw new Error("BAD_REQUEST:El torneo solo se asigna a delegados");
+    if (body.torneoId && !(await prisma.torneo.findUnique({ where: { id: body.torneoId } }))) throw new Error("NOT_FOUND");
 
-    const clave = generarClave();
+    const clave = generarClave(body.nombreCompleto, body.documento);
     const ctx = await auth.$context;
     const hash = await ctx.password.hash(clave);
     const creado = await ctx.internalAdapter.createUser(

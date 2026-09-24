@@ -17,17 +17,12 @@ describe("alta de usuarios: nombre de usuario", () => {
 });
 
 describe("alta de usuarios: clave inicial", () => {
-  it("genera una clave aleatoria de 14 caracteres con mayúscula, minúscula, dígito y símbolo", () => {
-    const clave = generarClave();
-    expect(clave).toHaveLength(14);
-    expect(clave).toMatch(/[A-Z]/);
-    expect(clave).toMatch(/[a-z]/);
-    expect(clave).toMatch(/[0-9]/);
-    expect(clave).toMatch(/[^A-Za-z0-9]/);
+  it("genera primerNombre + 50 + los últimos tres dígitos del documento", () => {
+    expect(generarClave("María José Álvarez", "123456789")).toBe("María50789");
   });
 
-  it("genera claves distintas entre llamadas", () => {
-    expect(generarClave()).not.toBe(generarClave());
+  it("usa los últimos tres dígitos aunque el documento tenga separadores", () => {
+    expect(generarClave("Pablo Díaz", "987654321")).toBe("Pablo50321");
   });
 });
 
@@ -42,5 +37,9 @@ describe("alta de usuarios: contratos zod", () => {
     expect(crearUsuarioSchema.safeParse({ nombreCompleto: "Pablo Díaz", documento: "123456789", correo: "pablo@correo.com", telefono: "3001112233", rol: "root" }).success).toBe(false);
     expect(recoveryConfirmSchema.safeParse({ telefono: "3001112233", codigo: "12345", nuevaClave: "clave12345" }).success).toBe(false);
     expect(recoveryConfirmSchema.parse({ telefono: "3001112233", codigo: "123456", nuevaClave: "clave12345" }).codigo).toBe("123456");
+  });
+
+  it("acepta el correo omitido", () => {
+    expect(crearUsuarioSchema.parse({ nombreCompleto: "Pablo Díaz", documento: "123456789", telefono: "3001112233", rol: "admin" }).correo).toBe("");
   });
 });

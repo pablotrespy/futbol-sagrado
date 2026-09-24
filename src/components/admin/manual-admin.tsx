@@ -86,7 +86,7 @@ const SECCIONES_ADMIN = [
   {
     titulo: "9. Crear usuarios",
     contenido: [
-      "Ingrese nombre, cédula, teléfono y correo. Seleccione el rol. El sistema genera usuario y contraseña.",
+      "Ingrese nombre, cédula y teléfono. El correo es opcional. Seleccione el rol. La contraseña se genera como primerNombre50últimos3dígitosDeCédula.",
       "Las credenciales se muestran una vez. Si se pierden, solicite recuperación de contraseña.",
       "Los roles NO se pueden cambiar después de creados. Si necesita cambiar un rol, cree un nuevo usuario.",
     ],

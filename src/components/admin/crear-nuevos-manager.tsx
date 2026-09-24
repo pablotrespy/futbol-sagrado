@@ -79,7 +79,7 @@ export function CrearNuevosManager({ role }: { role: string }) {
             <Field label="Cédula / documento"><Input autoComplete="off" inputMode="numeric" value={documento} onChange={(e) => setDocumento(e.target.value)} required /></Field>
             <Field label="Teléfono"><Input autoComplete="off" inputMode="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} required /></Field>
           </div>
-          <Field label="Correo"><Input type="email" autoComplete="off" value={correo} onChange={(e) => setCorreo(e.target.value)} required /></Field>
+          <Field label="Correo (opcional)"><Input type="email" autoComplete="off" value={correo} onChange={(e) => setCorreo(e.target.value)} /></Field>
           <Field label="Rol">
             <select value={rol} onChange={(e) => cambiarRol(e.target.value as AppRole)} className="h-11 w-full rounded-xl border border-stone-300 bg-white px-3 text-sm">
               {assignable.map((r) => <option key={r} value={r}>{roleLabels[r]}</option>)}
