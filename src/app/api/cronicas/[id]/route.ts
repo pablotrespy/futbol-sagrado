@@ -1,0 +1,3 @@
+// Fase 4 / módulo 8: edición y aprobación humana de la crónica.
+import{apiError}from"@/lib/api";import{prisma}from"@/lib/prisma";import{requirePermission}from"@/lib/rbac";import{editarCronicaSchema}from"@/schemas/cronica";
+export async function PUT(request:Request,context:{params:Promise<{id:string}>}){try{await requirePermission("gestionar_cronicas");const{id}=await context.params;const data=editarCronicaSchema.parse(await request.json());return Response.json(await prisma.cronica.update({where:{id},data:{titulo:data.titulo,texto:data.texto,estado:data.aprobar?"APROBADA":"BORRADOR",aprobadaAt:data.aprobar?new Date():null}}))}catch(e){return apiError(e)}}

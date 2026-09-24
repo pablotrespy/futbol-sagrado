@@ -1,0 +1,39 @@
+# Fase 0: servicio PostgreSQL reproducible para desarrollo local.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: padres-plus-50-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: padres_plus_50
+      POSTGRES_USER: padres_app
+      POSTGRES_PASSWORD: padres_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - padres_plus_50_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U padres_app -d padres_plus_50"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: padres-plus-50-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050:5050"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  padres_plus_50_data:
+  pgadmin_data:

@@ -1,0 +1,464 @@
+// Fase 0: persistencia base, autenticación Better Auth y roles del panel administrativo.
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  supervisor
+  operador_de_mesa
+  delegado
+}
+
+enum EstadoTorneo {
+  BORRADOR
+  ACTIVO
+  FINALIZADO
+  CANCELADO
+}
+
+enum EstadoPartido {
+  PROGRAMADO
+  EN_CURSO
+  SUSPENDIDO
+  FINALIZADO
+  CANCELADO
+}
+
+enum EstadoJornada {
+  NORMAL
+  SUSPENDIDA
+  CANCELADA
+}
+
+enum TipoTarjeta {
+  AMARILLA
+  AZUL
+  ROJA
+}
+
+enum EstadoPago {
+  PENDIENTE
+  PAGADA
+}
+
+enum EstadoSancion {
+  ACTIVA
+  CUMPLIDA
+  REVOCADA
+}
+
+enum EstadoCronica {
+  BORRADOR
+  APROBADA
+  PUBLICADA
+  ERROR
+}
+
+enum CanalPublicacion {
+  X
+  INSTAGRAM
+}
+
+enum TipoPlanilla {
+  OPERADOR_MESA
+  ARBITRO
+  EQUIPOS_JUGADORES
+}
+
+model User {
+  id                 String               @id @default(cuid())
+  name               String
+  email              String               @unique
+  username           String?              @unique
+  displayUsername    String?
+  emailVerified      Boolean              @default(false)
+  image              String?
+  role               UserRole             @default(admin)
+  documento          String?              @unique
+  telefono           String?
+  torneoId           String?
+  torneo             Torneo?              @relation(fields: [torneoId], references: [id], onDelete: SetNull)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([torneoId])
+  @@map("user")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codigo     String
+  expiresAt  DateTime
+  usado      Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("password_reset_token")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  issuer                String
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([issuer, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Cancha {
+  id          String    @id @default(cuid())
+  nombre      String    @unique
+  ubicacion   String?
+  descripcion String?
+  activa      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  partidos    Partido[]
+}
+
+model Operador {
+  id        String     @id @default(cuid())
+  nombres   String
+  apellidos String
+  activo    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  partidos  Partido[]
+
+  @@index([apellidos, nombres])
+  @@map("operador")
+}
+
+model Arbitro {
+  id        String     @id @default(cuid())
+  nombres   String
+  apellidos String
+  activo    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  partidos  Partido[]
+
+  @@index([apellidos, nombres])
+  @@map("arbitro")
+}
+
+model Equipo {
+  id                String                @id @default(cuid())
+  torneoId          String
+  torneo            Torneo                @relation(fields: [torneoId], references: [id], onDelete: Restrict)
+  nombre            String
+  color             String?
+  activo            Boolean               @default(true)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  jugadores         Jugador[]
+  partidosLocal     Partido[]             @relation("EquipoLocal")
+  partidosVisitante Partido[]             @relation("EquipoVisitante")
+  goles             Gol[]
+  clasificaciones   ClasificacionEquipo[]
+
+  @@unique([torneoId, nombre])
+  @@index([torneoId])
+}
+
+model Torneo {
+  id                  String                @id @default(cuid())
+  nombre              String                @unique
+  temporada           String
+  estado              EstadoTorneo          @default(BORRADOR)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  jornadas            Jornada[]
+  equipos             Equipo[]
+  sanciones           Sancion[]
+  clasificaciones     ClasificacionEquipo[]
+  estadisticasJugador EstadisticaJugador[]
+  comunicados         Comunicado[]
+  usuarios            User[]
+}
+
+model Jornada {
+  id        String    @id @default(cuid())
+  numero    Int
+  nombre    String
+  fecha     DateTime?
+  estado    EstadoJornada @default(NORMAL)
+  torneoId  String
+  torneo    Torneo    @relation(fields: [torneoId], references: [id], onDelete: Cascade)
+  partidos  Partido[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([torneoId, numero])
+  @@index([torneoId])
+}
+
+model Partido {
+  id                String        @id @default(cuid())
+  jornadaId         String
+  jornada           Jornada       @relation(fields: [jornadaId], references: [id], onDelete: Cascade)
+  equipoLocalId     String
+  equipoLocal       Equipo        @relation("EquipoLocal", fields: [equipoLocalId], references: [id], onDelete: Restrict)
+  equipoVisitanteId String
+  equipoVisitante   Equipo        @relation("EquipoVisitante", fields: [equipoVisitanteId], references: [id], onDelete: Restrict)
+  canchaId          String
+  cancha            Cancha        @relation(fields: [canchaId], references: [id], onDelete: Restrict)
+  operadorId        String?
+  operador          Operador?     @relation(fields: [operadorId], references: [id], onDelete: SetNull)
+  arbitroId         String?
+  arbitro           Arbitro?      @relation(fields: [arbitroId], references: [id], onDelete: SetNull)
+  inicio            DateTime
+  inicioEfectivo    DateTime?
+  duracionMinutos   Int           @default(60)
+  estado            EstadoPartido @default(PROGRAMADO)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  acta              Acta?
+  cronica           Cronica?
+  sanciones         Sancion[]
+
+  @@unique([jornadaId, equipoLocalId, equipoVisitanteId])
+  @@index([jornadaId])
+  @@index([canchaId, inicio])
+  @@index([equipoLocalId, inicio])
+  @@index([equipoVisitanteId, inicio])
+}
+
+model Cronica {
+  id            String        @id @default(cuid())
+  partidoId     String        @unique
+  partido       Partido       @relation(fields: [partidoId], references: [id], onDelete: Cascade)
+  titulo        String
+  texto         String
+  estado        EstadoCronica @default(BORRADOR)
+  aprobadaAt    DateTime?
+  publicadaAt   DateTime?
+  errorDetalle  String?
+  publicaciones Publicacion[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Publicacion {
+  id           String           @id @default(cuid())
+  cronicaId    String
+  cronica      Cronica          @relation(fields: [cronicaId], references: [id], onDelete: Cascade)
+  canal        CanalPublicacion
+  externalId   String?
+  publicadaAt  DateTime?
+  errorDetalle String?
+  createdAt    DateTime         @default(now())
+
+  @@unique([cronicaId, canal])
+}
+
+model Jugador {
+  id              String               @id @default(cuid())
+  nombres         String
+  apellidos       String
+  documento       String?              @unique
+  fechaNacimiento DateTime?
+  numeroCamiseta  Int?
+  posicion        String?
+  vinculo         String?              @db.VarChar(50)
+  activo          Boolean              @default(true)
+  equipoId        String
+  equipo          Equipo               @relation(fields: [equipoId], references: [id], onDelete: Restrict)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  alineaciones    Alineacion[]
+  goles           Gol[]
+  tarjetas        Tarjeta[]
+  sanciones       Sancion[]
+  estadisticas    EstadisticaJugador[]
+
+  @@unique([equipoId, numeroCamiseta])
+  @@index([equipoId])
+}
+
+model Acta {
+  id              String       @id @default(cuid())
+  partidoId       String       @unique
+  partido         Partido      @relation(fields: [partidoId], references: [id], onDelete: Cascade)
+  observaciones   String?
+  operadorNombre  String?
+  operadorApellido String?
+  arbitroNombre   String?
+  arbitroApellido String?
+  finalizadaAt    DateTime?
+  alineaciones    Alineacion[]
+  goles           Gol[]
+  tarjetas        Tarjeta[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Alineacion {
+  id        String  @id @default(cuid())
+  actaId    String
+  acta      Acta    @relation(fields: [actaId], references: [id], onDelete: Cascade)
+  jugadorId String
+  jugador   Jugador @relation(fields: [jugadorId], references: [id], onDelete: Restrict)
+  titular   Boolean @default(true)
+
+  @@unique([actaId, jugadorId])
+}
+
+model Gol {
+  id        String   @id @default(cuid())
+  actaId    String
+  acta      Acta     @relation(fields: [actaId], references: [id], onDelete: Cascade)
+  jugadorId String
+  jugador   Jugador  @relation(fields: [jugadorId], references: [id], onDelete: Restrict)
+  equipoId  String
+  equipo    Equipo   @relation(fields: [equipoId], references: [id], onDelete: Restrict)
+  minuto    Int
+  autogol   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Tarjeta {
+  id        String      @id @default(cuid())
+  actaId    String
+  acta      Acta        @relation(fields: [actaId], references: [id], onDelete: Cascade)
+  jugadorId String
+  jugador   Jugador     @relation(fields: [jugadorId], references: [id], onDelete: Restrict)
+  tipo      TipoTarjeta
+  minuto    Int
+  createdAt DateTime    @default(now())
+}
+
+model Sancion {
+  id                  String        @id @default(cuid())
+  jugadorId           String
+  jugador             Jugador       @relation(fields: [jugadorId], references: [id], onDelete: Restrict)
+  torneoId            String
+  torneo              Torneo        @relation(fields: [torneoId], references: [id], onDelete: Cascade)
+  partidoId           String?
+  partido             Partido?      @relation(fields: [partidoId], references: [id], onDelete: SetNull)
+  motivo              String
+  tarjeta             String?
+  jornadaInicioNumero Int
+  duracionFechas      Int?
+  indefinida          Boolean       @default(false)
+  valorPagar          Int?
+  estadoPago          EstadoPago    @default(PENDIENTE)
+  estado              EstadoSancion @default(ACTIVA)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([jugadorId, torneoId, estado])
+  @@index([partidoId])
+}
+
+model ClasificacionEquipo {
+  id             String   @id @default(cuid())
+  torneoId       String
+  torneo         Torneo   @relation(fields: [torneoId], references: [id], onDelete: Cascade)
+  equipoId       String
+  equipo         Equipo   @relation(fields: [equipoId], references: [id], onDelete: Cascade)
+  jugados        Int      @default(0)
+  ganados        Int      @default(0)
+  empatados      Int      @default(0)
+  perdidos       Int      @default(0)
+  golesFavor     Int      @default(0)
+  golesContra    Int      @default(0)
+  puntos         Int      @default(0)
+  puntosFairPlay Int      @default(0)
+  updatedAt      DateTime @updatedAt
+
+  @@unique([torneoId, equipoId])
+}
+
+model EstadisticaJugador {
+  id        String   @id @default(cuid())
+  torneoId  String
+  torneo    Torneo   @relation(fields: [torneoId], references: [id], onDelete: Cascade)
+  jugadorId String
+  jugador   Jugador  @relation(fields: [jugadorId], references: [id], onDelete: Cascade)
+  goles     Int      @default(0)
+  amarillas Int      @default(0)
+  rojas     Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([torneoId, jugadorId])
+}
+
+model Comunicado {
+  id            String    @id @default(cuid())
+  torneoId      String
+  torneo        Torneo    @relation(fields: [torneoId], references: [id], onDelete: Cascade)
+  resolucion    String
+  fecha         DateTime
+  nombreArchivo String
+  tipoMime      String    @default("application/pdf")
+  archivoPath   String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([torneoId])
+  @@map("comunicado")
+}
+
+model FormatoPlanilla {
+  id            String        @id @default(cuid())
+  tipo          TipoPlanilla  @unique
+  nombreArchivo String
+  tipoMime      String        @default("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+  archivoPath   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("formato_planilla")
+}
