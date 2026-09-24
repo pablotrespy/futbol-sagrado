@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import { signIn, getSession } from "@/lib/auth-client";
 import { http } from "@/lib/http";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ export function AuthForm() {
   const [step, setStep] = useState<"login" | "peticion" | "confirmar">("login");
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [telefono, setTelefono] = useState("");
   const [codigo, setCodigo] = useState("");
   const [nuevaClave, setNuevaClave] = useState("");
@@ -96,7 +97,12 @@ export function AuthForm() {
             <Input autoComplete="username" value={usuario} onChange={(e) => setUsuario(e.target.value)} autoFocus required />
           </Field>
           <Field label="Contraseña">
-            <Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div className="relative">
+              <Input type={showPassword ? "text" : "password"} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="pr-11" required />
+              <button type="button" aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} onClick={() => setShowPassword((visible) => !visible)} className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-stone-400 transition hover:bg-stone-100 hover:text-stone-700">
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
           </Field>
           {serverError && <p role="alert" className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700">{serverError}</p>}
           {info && <p role="status" className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-700">{info}</p>}
