@@ -6,8 +6,7 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: { path: "prisma/migrations" },
   datasource: {
-    url: env("DATABASE_URL"),
-    // BD sombra para diff de migraciones sin TTY (local).
-    shadowDatabaseUrl: "postgresql://padres_app:padres_dev_password@localhost:5433/padres_plus_50_shadow?schema=public",
+    // Prisma CLI usa la conexión directa de Neon; la app conserva DATABASE_URL pooled.
+    url: env("DATABASE_URL_UNPOOLED"),
   },
 });
