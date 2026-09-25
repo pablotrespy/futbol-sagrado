@@ -1,7 +1,6 @@
 import { apiError } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/rbac";
-import { leerPlanilla } from "@/lib/almacen";
 
 export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
   try {
@@ -9,7 +8,7 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     const { id } = await context.params;
     const planilla = await prisma.formatoPlanilla.findUnique({ where: { id } });
     if (!planilla) throw new Error("NOT_FOUND");
-    const buffer = await leerPlanilla(id);
+    const buffer = planilla.contenido ? Buffer.from(planilla.contenido) : null;
     if (!buffer) throw new Error("NOT_FOUND");
     const nombre = planilla.nombreArchivo.replace(/[^\w.\-\u00C0-\uFFFF]+/g, "_");
     return new Response(new Uint8Array(buffer), {

@@ -3,7 +3,6 @@ import { apiError } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/rbac";
 import { tipoPlanillaSchema } from "@/schemas/planilla";
-import { guardarPlanilla } from "@/lib/almacen";
 
 const MIME_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const MAX_XLSX_BYTES = 10 * 1024 * 1024;
@@ -37,16 +36,16 @@ export async function POST(request: Request) {
     if (!(archivo instanceof File) || archivo.size === 0) throw new Error("CONFLICT:Adjunta la planilla Excel.");
     if (archivo.size > MAX_XLSX_BYTES) throw new Error("CONFLICT:El archivo supera el tamaño máximo de 10 MB.");
     if (!esExcel(archivo)) throw new Error("CONFLICT:El archivo debe ser Excel (.xlsx o .xls).");
+    const contenido = Buffer.from(await archivo.arrayBuffer());
 
     const existente = await prisma.formatoPlanilla.findUnique({ where: { tipo } });
     const id = existente?.id ?? randomUUID();
     const guardado = await prisma.formatoPlanilla.upsert({
       where: { tipo },
-      create: { id, tipo, nombreArchivo: archivo.name, tipoMime: MIME_XLSX, archivoPath: `${id}.xlsx` },
-      update: { nombreArchivo: archivo.name, tipoMime: MIME_XLSX, archivoPath: `${id}.xlsx` },
+      create: { id, tipo, nombreArchivo: archivo.name, tipoMime: MIME_XLSX, archivoPath: `${id}.xlsx`, contenido },
+      update: { nombreArchivo: archivo.name, tipoMime: MIME_XLSX, archivoPath: `${id}.xlsx`, contenido },
       select: CAMPOS,
     });
-    await guardarPlanilla(id, Buffer.from(await archivo.arrayBuffer()));
     return Response.json(guardado satisfies PlanillaRow, { status: existente ? 200 : 201 });
   } catch (error) { return apiError(error); }
 }

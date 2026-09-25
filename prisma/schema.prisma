@@ -459,6 +459,7 @@ model FormatoPlanilla {
   nombreArchivo String
   tipoMime      String        @default("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
   archivoPath   String
+  contenido     Bytes?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
