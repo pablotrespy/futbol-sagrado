@@ -18,10 +18,10 @@ export default function Home() {
         <div className="flex flex-1 items-center py-16">
           <div>
             <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-amber-300">La cancha también se organiza</p>
-            <h1 className="max-w-3xl text-5xl font-black leading-[.95] tracking-tight sm:text-7xl">El campeonato, <span className="text-red-400">en un solo equipo.</span></h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-stone-300 sm:text-lg">Gestión deportiva, actas en vivo y consulta pública para vivir cada fecha con menos papeleo y más fútbol.</p>
+            <h1 className="max-w-3xl text-5xl font-black leading-[.95] tracking-tight sm:text-7xl">Fútbol, <span className="text-red-400">amistad y comunidad.</span></h1>
+            <p className="mt-7 max-w-xl text-base leading-7 text-stone-300 sm:text-lg">Un espacio de recreación y sana convivencia para que los padres de familia compartan, disfruten del deporte y fortalezcan los lazos de nuestra comunidad corazonista.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="/campeonato" className="rounded-full bg-red-700 px-6 py-3 text-sm font-bold shadow-lg shadow-red-950 transition hover:bg-red-600">Ver campeonato</a>
+              <a href="/campeonato" className="rounded-full bg-red-700 px-6 py-3 text-sm font-bold shadow-lg shadow-red-950 transition hover:bg-red-600">Consultar información</a>
               <span className="rounded-full border border-white/15 px-6 py-3 text-sm text-stone-300">Mobile-first · Web responsive</span>
             </div>
           </div>
