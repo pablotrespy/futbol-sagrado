@@ -254,7 +254,7 @@ export function JugadoresManager({ torneoId }: { torneoId: string }) {
           </div>
         )}
         <div className="mt-6 border-t border-stone-200 pt-5">
-          <FormatosSeccion sencillo variante="verde" tipos={["EQUIPOS_JUGADORES"]} />
+          <FormatosSeccion sencillo variante="verde" tipos={["EQUIPOS", "JUGADORES"]} />
         </div>
       </section>
     </div>

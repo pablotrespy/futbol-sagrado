@@ -69,6 +69,8 @@ enum TipoPlanilla {
   OPERADOR_MESA
   ARBITRO
   EQUIPOS_JUGADORES
+  EQUIPOS
+  JUGADORES
 }
 
 model User {
