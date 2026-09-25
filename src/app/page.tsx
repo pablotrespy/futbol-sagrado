@@ -17,8 +17,7 @@ export default function Home() {
         </header>
         <div className="flex flex-1 items-center py-16">
           <div>
-            <h1 className="max-w-3xl text-5xl font-black leading-[.95] tracking-tight sm:text-7xl">Fútbol, <span className="text-red-400">amistad y comunidad.</span></h1>
-            <p className="mt-7 max-w-xl text-base leading-7 text-stone-300 sm:text-lg">Un espacio de recreación y sana convivencia para que los padres de familia compartan, disfruten del deporte y fortalezcan los lazos de nuestra comunidad corazonista.</p>
+            <h1 className="max-w-3xl text-5xl font-black leading-[.95] tracking-tight sm:text-7xl">Fútbol, <span className="text-red-400">pasión y recreación.</span></h1>
             <div className="mt-9 flex flex-wrap gap-3">
               <a href="/campeonato" className="rounded-full bg-red-700 px-6 py-3 text-sm font-bold shadow-lg shadow-red-950 transition hover:bg-red-600">Consultar información</a>
               <span className="rounded-full border border-white/15 px-6 py-3 text-sm text-stone-300">Mobile-first · Web responsive</span>
