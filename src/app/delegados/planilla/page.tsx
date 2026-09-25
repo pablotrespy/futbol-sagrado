@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { SancionesManager } from "@/components/admin/sanciones-manager";
 import { MenuDelegado } from "@/components/delegados/menu-delegado";
 import { BotonSalir } from "@/components/delegados/boton-salir";
+import { CambiarClave } from "@/components/cambiar-clave";
 
 export default async function PlanillaDelegadoPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -36,6 +37,7 @@ export default async function PlanillaDelegadoPage() {
             <p className="text-xs text-stone-400">Delegados · {torneo.nombre}</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
+            <div className="hidden sm:block"><CambiarClave className="text-white hover:bg-white/10" /></div>
             <span className="hidden text-right sm:block">
               <p className="font-semibold">{session.user.name}</p>
               <p className="text-xs capitalize text-amber-300">delegado</p>
