@@ -1,5 +1,6 @@
 // Fase 0: portada responsive que expone la base funcional del producto.
 import { CalendarDays, ShieldCheck, Trophy, Users } from "lucide-react";
+import Image from "next/image";
 
 const modules = [
   { icon: CalendarDays, title: "Programación", copy: "Fechas, canchas y horarios sin cruces." },
@@ -13,7 +14,7 @@ export default function Home() {
       <section className="mx-auto flex min-h-screen max-w-6xl flex-col px-5 py-6 sm:px-8 lg:px-12">
         <header className="flex items-center justify-between border-b border-white/10 pb-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-full border border-amber-300/50 bg-amber-300/10 text-sm font-black text-amber-200">50+</span>
+            <Image src="/escudo-sagrado-corazon.png" alt="Escudo del Colegio del Sagrado Corazón" width={48} height={48} priority className="size-12 rounded-full object-contain" />
             <div><p className="font-semibold tracking-wide">Campeonato de Fútbol</p><p className="text-xs text-stone-400">Sagrado Corazón de Jesús</p></div>
           </div>
           <a href="/acceso" className="flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-200"><ShieldCheck className="size-4" /> Acceso a plataforma</a>
