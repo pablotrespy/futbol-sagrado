@@ -14,7 +14,7 @@ export default function Home() {
         <header className="flex items-center justify-between border-b border-white/10 pb-5">
           <div className="flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-full border border-amber-300/50 bg-amber-300/10 text-sm font-black text-amber-200">50+</span>
-            <div><p className="font-semibold tracking-wide">Padres Plus 50</p><p className="text-xs text-stone-400">Sagrado Corazón de Jesús</p></div>
+            <div><p className="font-semibold tracking-wide">Fútbol Sagrado Corazón de Jesús</p><p className="text-xs text-stone-400">Campeonato deportivo</p></div>
           </div>
           <a href="/acceso" className="flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-200"><ShieldCheck className="size-4" /> Acceso a plataforma</a>
         </header>
