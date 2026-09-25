@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-stone-950 text-stone-50">
       <Image src="/fondo-cancha-nocturna.jpg" alt="Cancha de fútbol iluminada de noche" fill priority className="object-cover object-center" />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,.92),rgba(8,8,8,.62)),linear-gradient(180deg,rgba(8,8,8,.35),rgba(8,8,8,.88))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,8,8,.68),rgba(8,8,8,.28)),linear-gradient(180deg,rgba(8,8,8,.18),rgba(8,8,8,.62))]" />
       <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col px-5 py-6 sm:px-8 lg:px-12">
         <header className="flex items-center justify-between border-b border-white/10 pb-5">
           <div className="flex items-center gap-3">
