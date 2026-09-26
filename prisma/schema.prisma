@@ -446,6 +446,7 @@ model Comunicado {
   nombreArchivo String
   tipoMime      String    @default("application/pdf")
   archivoPath   String
+  contenido     Bytes?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

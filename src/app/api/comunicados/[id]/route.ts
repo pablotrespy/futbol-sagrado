@@ -3,7 +3,7 @@ import { apiError } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/rbac";
 import { comunicadoSchema } from "@/schemas/comunicado";
-import { eliminarPdf, guardarPdf } from "@/lib/almacen";
+import { eliminarPdf } from "@/lib/almacen";
 
 const CAMPOS = { id: true, resolucion: true, fecha: true, nombreArchivo: true, tipoMime: true, updatedAt: true } as const;
 
@@ -37,10 +37,10 @@ export async function PUT(request: Request, context: { params: Promise<{ id: str
         resolucion: data.resolucion,
         fecha: data.fecha,
         ...(archivo ? { nombreArchivo: archivo.nombre, tipoMime: archivo.tipo } : {}),
+        ...(archivo ? { contenido: archivo.buffer } : {}),
       },
       select: CAMPOS,
     });
-    if (archivo) await guardarPdf(id, archivo.buffer);
     return Response.json(actualizado);
   } catch (error) { return apiError(error); }
 }

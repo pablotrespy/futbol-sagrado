@@ -4,7 +4,7 @@ import { apiError } from "@/lib/api";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/rbac";
 import { comunicadoSchema } from "@/schemas/comunicado";
-import { guardarPdf, MAX_PDF_BYTES } from "@/lib/almacen";
+import { MAX_PDF_BYTES } from "@/lib/almacen";
 
 type ComunicadoRow = { id: string; resolucion: string; fecha: Date; nombreArchivo: string; tipoMime: string; updatedAt: Date };
 
@@ -57,10 +57,10 @@ export async function POST(request: Request) {
         nombreArchivo: nombre,
         tipoMime: tipo,
         archivoPath: `${id}.pdf`,
+        contenido: buffer,
       },
       select: CAMPOS,
     });
-    await guardarPdf(id, buffer);
     return Response.json(creado satisfies ComunicadoRow, { status: 201 });
   } catch (error) { return apiError(error); }
 }
