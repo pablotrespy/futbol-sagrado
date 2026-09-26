@@ -122,7 +122,7 @@ export function SancionesManager({ readOnly = false, torneoId = "", publicApi = 
 
   const BadgeTarjetas = ({ tarjetas }: { tarjetas: Amonestacion["tarjetas"] }) => (
     <div className="flex flex-wrap gap-1">
-      {tarjetas.map((t, i) => (
+      {[...tarjetas].sort((a, b) => ({ AMARILLA: 0, AZUL: 1, ROJA: 2 }[a] ?? 9) - ({ AMARILLA: 0, AZUL: 1, ROJA: 2 }[b] ?? 9)).map((t, i) => (
         <span key={i} className={`inline-block rounded-full px-2 py-0.5 text-xs font-bold ${TARJETA_COLORS[t] ?? "bg-stone-100 text-stone-600"}`}>{NOMBRE_TARJETA[t]}</span>
       ))}
     </div>
